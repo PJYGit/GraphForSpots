@@ -24,6 +24,7 @@ public:
     void ReadFiles();
     void InitButtons();
     void InitLines();
+    void DrawLines(int fnode, int snode);
     QRect GetPos(int num);
 
     typedef struct ArcNode
@@ -36,6 +37,7 @@ public:
 
         typedef struct VNode
         {
+            int num;
             QString spot;
             QString  ticketPrice;   // 顶点信息
             struct ArcNode  *firstarc = nullptr;//指向下一个表节点

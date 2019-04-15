@@ -9,6 +9,7 @@ int count;
 int s[100];
 int k = 7;
 QString tempS = "";
+int nowSpot = 0;
 
 GForSpots::GForSpots(QWidget *parent) :
     QMainWindow(parent),
@@ -23,22 +24,6 @@ GForSpots::GForSpots(QWidget *parent) :
     InitButtons();
     InitLines();
 
-    /*
-    int u = 0;
-    QString t = QString::number(u);
-    QPushButton *aux = ui->centralWidget->findChild<QPushButton*>(t);
-
-    int f = aux->x();
-
-    int k = aux->y();
-    QString temp = QString::number(f);
-    ui->centralWidget->findChild<QPushButton*>(t)->setText(temp);
-
-
-    my_paintLine(f, k, 30, 30);
-    this->update();
-    this->repaint();
-    */
 }
 
 GForSpots::~GForSpots()
@@ -71,7 +56,7 @@ void GForSpots::ReadFiles(){
         for (i = 0; i < G.n; i++){
             int j;
             fscanf(f, "%d", &j);
-
+            G.vertices[j].num = j;
             char Temp[100];
             fscanf(f, "%s", Temp);
             G.vertices[j].spot = Temp;
@@ -139,7 +124,28 @@ void GForSpots::InitButtons(){
 }
 
 void GForSpots::InitLines(){
+    for(int i=0;i<G.n;i++){
+        ArcNode *temp = G.vertices[i].firstarc;
+        int numTemp = G.vertices[temp->adjvex].num;
+        DrawLines(i, numTemp);
 
+        while (temp->nextarc != nullptr){
+            temp = temp->nextarc;
+            DrawLines(i,G.vertices[temp->adjvex].num);
+        }
+    }
+}
+
+void GForSpots::DrawLines(int fnode, int snode){
+    QString temp1 = QString::number(fnode);
+    QString temp2 = QString::number(snode);
+    QPushButton *tempBut1 = ui->centralWidget->findChild<QPushButton*>(temp1);
+    QPushButton *tempBut2 = ui->centralWidget->findChild<QPushButton*>(temp2);
+    int a = tempBut1->x();
+    int b = tempBut1->y()+20;
+    int c = tempBut2->x();
+    int d = tempBut2->y()+20;
+    my_paintLine(a,b,c,d,true);
 }
 
 QRect GForSpots::GetPos(int num){
@@ -162,7 +168,7 @@ QRect GForSpots::GetPos(int num){
         return QRect(460,385,50,50);
     }
     else if (num == 6) {
-        return QRect(300,315,50,50);
+        return QRect(300,290,50,50);
     }
     else if (num == 7) {
         return QRect(180,160,50,50);
@@ -180,21 +186,21 @@ QRect GForSpots::GetPos(int num){
 void GForSpots::infor_Check(){
     ui->Information->setText("");
     QString temp = sender()->objectName();
-    int nowSpot = temp.toInt();
+    nowSpot = temp.toInt();
     ui->Information->setText("Spot:"+G.vertices[nowSpot].spot+"\n"
                              +G.vertices[nowSpot].ticketPrice);
     ui->Information->append("There are several spots around this one:");
     ArcNode* p = G.vertices[nowSpot].firstarc;
+
     ui->Information->append(G.vertices[nowSpot].spot+"->"
                             +G.vertices[p->adjvex].spot+"   "
-                            +QString::number(p->weight));
-
+                            +QString::number(p->weight)+"m");
 
     while (p->nextarc != nullptr){
         p = p->nextarc;
         ui->Information->append(G.vertices[nowSpot].spot+"->"
                                 +G.vertices[p->adjvex].spot+"   "
-                                +QString::number(p->weight));
+                                +QString::number(p->weight)+"m");
 
     }
 }

@@ -60,7 +60,7 @@ void GForSpots::my_paintLine(int x1, int y1, int x2, int y2, bool color){
 }
 
 void GForSpots::ReadFiles(){
-    FILE *f = fopen("F:/Qt codes/GraphForSpots/Vex.txt", "r");
+    FILE *f = fopen("F:/Qt codes/GForSpots/Vex.txt", "r");
         fscanf(f, "%d", &G.n);
         int i;
         for (i = 0; i < G.n; i++){
@@ -76,7 +76,7 @@ void GForSpots::ReadFiles(){
         fclose(f);
 
         //读入边信息
-        f = fopen("F:/Qt codes/GraphForSpots/Edge.txt", "r");
+        f = fopen("F:/Qt codes/GForSpots/Edge.txt", "r");
         int a;
         int b;
         int length;

@@ -19,7 +19,7 @@ public:
     ~GForSpots();
 
     void paintEvent(QPaintEvent *event);
-    void my_paintLine(int x1, int y1, int x2, int y2);
+    void my_paintLine(int x1, int y1, int x2, int y2, bool color);
 
     void ReadFiles();
     void InitButtonsAndLines();

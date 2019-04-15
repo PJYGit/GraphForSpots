@@ -5,6 +5,10 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
+int count;
+int s[100];
+int k = 7;
+QString tempS = "";
 
 GForSpots::GForSpots(QWidget *parent) :
     QMainWindow(parent),
@@ -16,7 +20,8 @@ GForSpots::GForSpots(QWidget *parent) :
     Pix.fill(Qt::gray);
 
     ReadFiles();
-    InitButtonsAndLines();
+    InitButtons();
+    InitLines();
 
     /*
     int u = 0;
@@ -119,7 +124,7 @@ void GForSpots::ReadFiles(){
 }
 
 
-void GForSpots::InitButtonsAndLines(){
+void GForSpots::InitButtons(){
 
     for(int i=0;i<G.n;i++){
         QPushButton *but = new QPushButton(ui->centralWidget);
@@ -129,7 +134,12 @@ void GForSpots::InitButtonsAndLines(){
         but->setText(QString::number(i));
 
         but->setGeometry(GetPos(i));
+        connect(but,SIGNAL(clicked()),this,SLOT(infor_Check()));
     }
+}
+
+void GForSpots::InitLines(){
+
 }
 
 QRect GForSpots::GetPos(int num){
@@ -167,7 +177,110 @@ QRect GForSpots::GetPos(int num){
     }
 }
 
+void GForSpots::infor_Check(){
+    ui->Information->setText("");
+    QString temp = sender()->objectName();
+    int nowSpot = temp.toInt();
+    ui->Information->setText("Spot:"+G.vertices[nowSpot].spot+"\n"
+                             +G.vertices[nowSpot].ticketPrice);
+    ui->Information->append("There are several spots around this one:");
+    ArcNode* p = G.vertices[nowSpot].firstarc;
+    ui->Information->append(G.vertices[nowSpot].spot+"->"
+                            +G.vertices[p->adjvex].spot+"   "
+                            +QString::number(p->weight));
 
+
+    while (p->nextarc != nullptr){
+        p = p->nextarc;
+        ui->Information->append(G.vertices[nowSpot].spot+"->"
+                                +G.vertices[p->adjvex].spot+"   "
+                                +QString::number(p->weight));
+
+    }
+}
+
+void GForSpots::on_Find_Roads_clicked()
+{
+    ui->Roads->setText("");
+    QString temp = ui->Start->toPlainText();
+    int start = temp.toInt();
+
+    bool visited[100];
+        int v;
+        for (v = 0; v<G.n; ++v)
+            visited[v] = false; // set flag for being visited
+        int a[100];
+        for (v = 0; v < G.n; ++v){
+            a[v] = -1;
+        }
+        count = 0;
+        DFS(G, start, visited, a);
+}
+
+void GForSpots::on_Find_Short_clicked()
+{
+    //TODO: Find the shortest road.
+}
+void GForSpots::on_Find_Tree_clicked()
+{
+    //TODO: Find the minimum spanning tree.
+}
+
+void GForSpots::DFS(ALGraph G, int v, bool* visited, int* a){
+    bool x[100];
+    int b[100];
+    int y;
+    for (y = 0; y < 100; y++){
+        x[y] = visited[y];
+        b[y] = a[y];
+    }
+
+    x[v] = true;
+    int i;
+    for (i = 0; i < G.n; ++i){
+        if (b[i] == -1){
+            break;
+        }
+    }
+    if (i == G.n-1){//走到头了
+        a[i] = v;
+        tempS = ui->Roads->toPlainText() + "Path";
+        tempS += QString::number(++count);
+        tempS += ":";
+        ui->Roads->setText(tempS);
+
+        int j;
+        for (j = 0; j < G.n-1; j++){
+            tempS = ui->Roads->toPlainText();
+            tempS += G.vertices[a[j]].spot;
+            tempS += "->";
+            ui->Roads->setText(tempS);
+        }
+        tempS = ui->Roads->toPlainText();
+        tempS += G.vertices[a[j]].spot;
+        tempS += "\n";
+        ui->Roads->setText(tempS);
+        return;
+    }
+
+    else{
+        b[i] = v;
+    }
+    struct ArcNode* w;
+    w = G.vertices[v].firstarc;
+
+    if (visited[w->adjvex] == false){
+        DFS(G, w->adjvex, x,b);
+    }
+    w = w->nextarc;
+
+    while (w != nullptr){
+        if (visited[w->adjvex] == false){
+            DFS(G, w->adjvex,x,b);
+        }
+        w = w->nextarc;
+    }
+}
 
 
 

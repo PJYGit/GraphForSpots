@@ -22,7 +22,8 @@ public:
     void my_paintLine(int x1, int y1, int x2, int y2, bool color);
 
     void ReadFiles();
-    void InitButtonsAndLines();
+    void InitButtons();
+    void InitLines();
     QRect GetPos(int num);
 
     typedef struct ArcNode
@@ -51,6 +52,17 @@ public:
             int  adjvex;  // a vertex in U
             int  lowcost; // weight of the edge
         }   closedge[100];
+
+        void DFS(ALGraph G, int v, bool* visited, int* a);
+
+private slots:
+        void on_Find_Roads_clicked();
+
+        void on_Find_Tree_clicked();
+
+        void on_Find_Short_clicked();
+
+        void infor_Check();
 
 private:
     Ui::GForSpots *ui;

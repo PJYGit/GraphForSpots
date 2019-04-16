@@ -24,7 +24,7 @@ public:
     void ReadFiles();
     void InitButtons();
     void InitLines();
-    void DrawLines(int fnode, int snode);
+    void DrawLines(int fnode, int snode, bool mode);
     QRect GetPos(int num);
 
     typedef struct ArcNode
@@ -56,6 +56,7 @@ public:
         }   closedge[100];
 
         void DFS(ALGraph G, int v, bool* visited, int* a);
+        void Dijkstra(ALGraph G, int v0, int path[], int dist[]);
 
 private slots:
         void on_Find_Roads_clicked();

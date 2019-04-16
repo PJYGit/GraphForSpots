@@ -172,7 +172,7 @@ QRect GForSpots::GetPos(int num){
         return QRect(300,290,50,50);
     }
     else if (num == 7) {
-        return QRect(180,160,50,50);
+        return QRect(180,175,50,50);
     }
     else if (num == 8) {
         return QRect(420,160,50,50);
@@ -186,6 +186,7 @@ QRect GForSpots::GetPos(int num){
 
 void GForSpots::infor_Check(){
     ui->Information->setText("");
+    InitLines();
     QString temp = sender()->objectName();
     nowSpot = temp.toInt();
     ui->Information->setText("Spot:"+G.vertices[nowSpot].spot+"\n"
@@ -209,6 +210,7 @@ void GForSpots::infor_Check(){
 void GForSpots::on_Find_Roads_clicked()
 {
     ui->Roads->setText("");
+    InitLines();
     QString temp = ui->Start->toPlainText();
     int start = temp.toInt();
 
@@ -281,7 +283,7 @@ void GForSpots::DFS(ALGraph G, int v, bool* visited, int* a){
 }
 
 void GForSpots::on_Find_Short_clicked()
-{
+{    
     int from = ui->ShortS->toPlainText().toInt();
     int to = ui->ShortE->toPlainText().toInt();
 
@@ -364,7 +366,71 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
 
 void GForSpots::on_Find_Tree_clicked()
 {
-    //TODO: Find the minimum spanning tree.
+    InitLines();
+    ui->Lenth->setText("");
+    int u = (k++)%G.n;
+    int total_length = Prim(G, u);
+    int i;
+
+    for (i = 0; i < G.n; i++){
+
+        if (i!=u){
+            DrawLines(i, closedge[i].adjvex,false);
+            this->repaint();
+        }
+
+    }
+
+    ui->Lenth->setText(QString::number(total_length) + "m");
+}
+
+int GForSpots::Prim(ALGraph G, int u){
+
+    int total_length = 0;
+    int j;
+    for (j = 0; j < G.n; ++j){
+            closedge[j].lowcost =100000;
+    }
+
+    ArcNode* p = G.vertices[u].firstarc;
+    while (p != nullptr){
+        closedge[p->adjvex].lowcost = p->weight;
+        closedge[p->adjvex].adjvex = u;
+        p = p->nextarc;
+    }
+    closedge[u].lowcost = 0;      // U＝{u}
+    int i;
+    for (i = 0; i < G.n-1; ++i){
+        int minimum = 100000;
+        int min = 0;
+        int k;
+        for (k = 0; k < G.n; k++){
+            if (closedge[k].lowcost < minimum&&closedge[k].lowcost != 0){
+                minimum = closedge[k].lowcost;
+                min = k;
+            }
+        }
+        total_length += minimum;
+        closedge[min].lowcost = 0;    // add vertex k into U
+
+
+        ArcNode* p = G.vertices[min].firstarc;
+        while (p != nullptr){
+
+            if (p->weight< closedge[p->adjvex].lowcost
+                && closedge[p->adjvex].lowcost>0){
+                closedge[p->adjvex].lowcost = p->weight;
+                closedge[p->adjvex].adjvex = min;
+            }
+
+            p = p->nextarc;
+        }
+
+        // fix the smallest weight of other edges
+    }
+
+
+    return total_length;
 }
 
 

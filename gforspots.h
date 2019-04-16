@@ -57,6 +57,7 @@ public:
 
         void DFS(ALGraph G, int v, bool* visited, int* a);
         void Dijkstra(ALGraph G, int v0, int path[], int dist[]);
+        int Prim(ALGraph G, int u);
 
 private slots:
         void on_Find_Roads_clicked();
@@ -66,6 +67,7 @@ private slots:
         void on_Find_Short_clicked();
 
         void infor_Check();
+
 
 private:
     Ui::GForSpots *ui;

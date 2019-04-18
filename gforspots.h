@@ -29,33 +29,32 @@ public:
 
     typedef struct ArcNode
         {
-            int   adjvex;   // ending vertex of the arc
-            struct ArcNode  *nextarc;//指向下一表节点
-            struct ArcNode  *priou;
-            int weight; // relevant weight of arc
-        } ArcNode;//表节点
+            int   adjvex;
+            struct ArcNode  *nextarc;
+            int weight;
+        } ArcNode;
 
         typedef struct VNode
         {
             int num;
             QString spot;
-            QString  ticketPrice;   // 顶点信息
-            struct ArcNode  *firstarc = nullptr;//指向下一个表节点
-        } VNode, AdjList[100];//表头结点
+            QString  ticketPrice;
+            struct ArcNode  *firstarc = nullptr;
+        } VNode, AdjList[100];
 
         struct ALGraph
         {
-            AdjList  vertices;//顶点信息
-            int n;//顶点个数
-            int e;//边个数
-        }G;//图
+            AdjList  vertices;
+            int n;
+            int e;
+        }G;
 
         struct{
-            int  adjvex;  // a vertex in U
-            int  lowcost; // weight of the edge
-        }   closedge[100];
+            int  adjvex;
+            int  lowcost;
+        }   clo_edge[100];
 
-        void DFS(ALGraph G, int v, bool* visited, int* a);
+        void DFS(ALGraph G, int first, bool* visited, int* origin);
         void Dijkstra(ALGraph G, int v0, int path[], int dist[]);
         int Prim(ALGraph G, int u);
 

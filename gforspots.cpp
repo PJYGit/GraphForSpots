@@ -7,8 +7,8 @@
 #define IMPOSSIBLE 100000
 
 int count;
-int s[100];
-int k = 7;
+int sign[100];
+int k_prim = 7;
 QString tempS = "";
 int nowSpot = 0;
 
@@ -68,19 +68,19 @@ void GForSpots::ReadFiles(){
 
     //读入边信息
     f = fopen("F:/Qt codes/GForSpots/Edge.txt", "r");
-    int a;
-    int b;
+    int k;
+    int m;
     int length;
-    while (fscanf(f, "%d\t%d\t%d",&a,&b,&length) != EOF){
+    while (fscanf(f, "%d\t%d\t%d",&k,&m,&length) != EOF){
         ArcNode* newNode;
         newNode = (ArcNode*)malloc(sizeof(ArcNode));
-        newNode->adjvex = b;
+        newNode->adjvex = m;
         newNode->weight = length;
         newNode->nextarc = NULL;
-        ArcNode* p = G.vertices[a].firstarc;
+        ArcNode* p = G.vertices[k].firstarc;
         if(p == NULL){//表头结点为空
-            G.vertices[a].firstarc = (ArcNode*)malloc(sizeof(ArcNode));//给表头结点的firstarc分配内存
-            G.vertices[a].firstarc = newNode;
+            G.vertices[k].firstarc = (ArcNode*)malloc(sizeof(ArcNode));//给表头结点的firstarc分配内存
+            G.vertices[k].firstarc = newNode;
         }
         else{
             while (p->nextarc != NULL){
@@ -91,13 +91,13 @@ void GForSpots::ReadFiles(){
 
         //由于是无向图，要分别对两个顶点建立联系
         newNode = (ArcNode*)malloc(sizeof(ArcNode));
-        newNode->adjvex = a;
+        newNode->adjvex = k;
         newNode->weight = length;
         newNode->nextarc = NULL;
-        p = G.vertices[b].firstarc;
+        p = G.vertices[m].firstarc;
         if (p == NULL){//表头结点为空
-            G.vertices[b].firstarc = (ArcNode*)malloc(sizeof(ArcNode));
-            G.vertices[b].firstarc = newNode;
+            G.vertices[m].firstarc = (ArcNode*)malloc(sizeof(ArcNode));
+            G.vertices[m].firstarc = newNode;
         }
         else{
             while (p->nextarc != NULL){
@@ -187,6 +187,7 @@ QRect GForSpots::GetPos(int num){
 void GForSpots::infor_Check(){
     ui->Information->setText("");
     InitLines();
+    this->repaint();
     QString temp = sender()->objectName();
     nowSpot = temp.toInt();
     ui->Information->setText("Spot:"+G.vertices[nowSpot].spot+"\n"
@@ -211,39 +212,40 @@ void GForSpots::on_Find_Roads_clicked()
 {
     ui->Roads->setText("");
     InitLines();
+    this->repaint();
     QString temp = ui->Start->toPlainText();
     int start = temp.toInt();
 
     bool visited[100];
-        int v;
-        for (v = 0; v<G.n; ++v)
-            visited[v] = false; // set flag for being visited
-        int a[100];
-        for (v = 0; v < G.n; ++v){
-            a[v] = -1;
-        }
-        count = 0;
-        DFS(G, start, visited, a);
+    int v;
+    for (v = 0; v<G.n; ++v)
+        visited[v] = false; // set flag for being visited
+    int origin[100];
+    for (v = 0; v < G.n; ++v){
+        origin[v] = -1;
+    }
+    count = 0;
+    DFS(G, start, visited, origin);
 }
 
-void GForSpots::DFS(ALGraph G, int v, bool* visited, int* a){
-    bool x[100];
-    int b[100];
-    int y;
-    for (y = 0; y < 100; y++){
-        x[y] = visited[y];
-        b[y] = a[y];
+void GForSpots::DFS(ALGraph G, int first, bool* visited, int* origin){
+    bool temp_v[100];
+    int temp_o[100];
+    int k;
+    for (k = 0; k < 100; k++){
+        temp_v[k] = visited[k];
+        temp_o[k] = origin[k];
     }
 
-    x[v] = true;
+    temp_v[first] = true;
     int i;
     for (i = 0; i < G.n; ++i){
-        if (b[i] == -1){
+        if (temp_o[i] == -1){
             break;
         }
     }
-    if (i == G.n-1){//走到头了
-        a[i] = v;
+    if (i == G.n-1){
+        origin[i] = first;
         tempS = ui->Roads->toPlainText() + "Path";
         tempS += QString::number(++count);
         tempS += ":";
@@ -252,33 +254,33 @@ void GForSpots::DFS(ALGraph G, int v, bool* visited, int* a){
         int j;
         for (j = 0; j < G.n-1; j++){
             tempS = ui->Roads->toPlainText();
-            tempS += G.vertices[a[j]].spot;
+            tempS += G.vertices[origin[j]].spot;
             tempS += "->";
             ui->Roads->setText(tempS);
         }
         tempS = ui->Roads->toPlainText();
-        tempS += G.vertices[a[j]].spot;
+        tempS += G.vertices[origin[j]].spot;
         tempS += "\n";
         ui->Roads->setText(tempS);
         return;
     }
 
     else{
-        b[i] = v;
+        temp_o[i] = first;
     }
-    struct ArcNode* w;
-    w = G.vertices[v].firstarc;
+    struct ArcNode* tempN;
+    tempN = G.vertices[first].firstarc;
 
-    if (visited[w->adjvex] == false){
-        DFS(G, w->adjvex, x,b);
+    if (visited[tempN->adjvex] == false){
+        DFS(G, tempN->adjvex, temp_v,temp_o);
     }
-    w = w->nextarc;
+    tempN = tempN->nextarc;
 
-    while (w != nullptr){
-        if (visited[w->adjvex] == false){
-            DFS(G, w->adjvex,x,b);
+    while (tempN != nullptr){
+        if (visited[tempN->adjvex] == false){
+            DFS(G, tempN->adjvex,temp_v,temp_o);
         }
-        w = w->nextarc;
+        tempN = tempN->nextarc;
     }
 }
 
@@ -290,20 +292,16 @@ void GForSpots::on_Find_Short_clicked()
     int path[100];
     int dist[100];
     Dijkstra(G, from, path, dist);
-    int y = to;
-    int i=0;
-    int re[10];
-    re[i] = y;
-    i++;
+    int i = 1;
     InitLines();
-
-    DrawLines(y, path[y], false);
     this->repaint();
-    while (path[y] != from){
-        y = path[y];
-        DrawLines(y, path[y], false);
+
+    DrawLines(to, path[to], false);
+    this->repaint();
+    while (path[to] != from){
+        to = path[to];
+        DrawLines(to, path[to], false);
         this->repaint();
-        re[i] =y;
         i++;
     }
 
@@ -313,7 +311,7 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
     int v;
     for(v = 0; v<G.n; ++v)
     {
-        s[v] = 0;
+        sign[v] = 0;
         dist[v] = IMPOSSIBLE;
         path[v] = -1;
     }
@@ -324,22 +322,22 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
         path[p->adjvex] = v0;
         p = p->nextarc;
     }
-    dist[v0] = 0;  s[v0] = 1;//S集中开始时只有v0
+    dist[v0] = 0;  sign[v0] = 1;//S集中开始时只有v0
     int i;
 
     for(i = 1; i<G.n; ++i){
         int min;
         min = IMPOSSIBLE;
-        int w;
-        for (w = 0; w < G.n; ++w){
-            if (s[w] == 0){
-                if (dist[w]<min) {
-                    v = w;
-                    min = dist[w];
+        int j;
+        for (j = 0; v < G.n; ++j){
+            if (sign[j] == 0){
+                if (dist[j]<min) {
+                    v = j;
+                    min = dist[j];
                 }
             }
         }
-        s[v] = 1;//将v加入S
+        sign[v] = 1;//将v加入S
 
         p = G.vertices[v].firstarc;
         int d;
@@ -351,12 +349,12 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
             q[p->adjvex] = p->weight;
             p = p->nextarc;
         }
-        for (w = 0; w < G.n; ++w){//调整其余在V-S的点
+        for (j = 0; v < G.n; ++j){//调整其余在V-S的点
 
-            if (s[w] == 0 && (dist[v] + q[w]<dist[w]))
+            if (sign[j] == 0 && (dist[v] + q[j]<dist[j]))
             {
-                dist[w] = dist[v] + q[w];
-                path[w] = v;
+                dist[j] = dist[v] + q[j];
+                path[j] = v;
             }
         }
 
@@ -367,15 +365,16 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
 void GForSpots::on_Find_Tree_clicked()
 {
     InitLines();
+    this->repaint();
     ui->Lenth->setText("");
-    int u = (k++)%G.n;
+    int u = (k_prim++)%G.n;
     int total_length = Prim(G, u);
     int i;
 
     for (i = 0; i < G.n; i++){
 
         if (i!=u){
-            DrawLines(i, closedge[i].adjvex,false);
+            DrawLines(i, clo_edge[i].adjvex,false);
             this->repaint();
         }
 
@@ -389,44 +388,42 @@ int GForSpots::Prim(ALGraph G, int u){
     int total_length = 0;
     int j;
     for (j = 0; j < G.n; ++j){
-            closedge[j].lowcost =100000;
+            clo_edge[j].lowcost =100000;
     }
 
     ArcNode* p = G.vertices[u].firstarc;
     while (p != nullptr){
-        closedge[p->adjvex].lowcost = p->weight;
-        closedge[p->adjvex].adjvex = u;
+        clo_edge[p->adjvex].lowcost = p->weight;
+        clo_edge[p->adjvex].adjvex = u;
         p = p->nextarc;
     }
-    closedge[u].lowcost = 0;      // U＝{u}
+    clo_edge[u].lowcost = 0;      // U＝{u}
     int i;
     for (i = 0; i < G.n-1; ++i){
         int minimum = 100000;
         int min = 0;
         int k;
         for (k = 0; k < G.n; k++){
-            if (closedge[k].lowcost < minimum&&closedge[k].lowcost != 0){
-                minimum = closedge[k].lowcost;
+            if (clo_edge[k].lowcost < minimum&&clo_edge[k].lowcost != 0){
+                minimum = clo_edge[k].lowcost;
                 min = k;
             }
         }
         total_length += minimum;
-        closedge[min].lowcost = 0;    // add vertex k into U
+        clo_edge[min].lowcost = 0;    // add vertex k into U
 
 
         ArcNode* p = G.vertices[min].firstarc;
         while (p != nullptr){
 
-            if (p->weight< closedge[p->adjvex].lowcost
-                && closedge[p->adjvex].lowcost>0){
-                closedge[p->adjvex].lowcost = p->weight;
-                closedge[p->adjvex].adjvex = min;
+            if (p->weight< clo_edge[p->adjvex].lowcost
+                && clo_edge[p->adjvex].lowcost>0){
+                clo_edge[p->adjvex].lowcost = p->weight;
+                clo_edge[p->adjvex].adjvex = min;
             }
 
             p = p->nextarc;
         }
-
-        // fix the smallest weight of other edges
     }
 
 

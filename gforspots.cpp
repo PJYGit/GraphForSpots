@@ -329,7 +329,7 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
         int min;
         min = IMPOSSIBLE;
         int j;
-        for (j = 0; v < G.n; ++j){
+        for (j = 0; j < G.n; ++j){
             if (sign[j] == 0){
                 if (dist[j]<min) {
                     v = j;
@@ -349,7 +349,7 @@ void GForSpots::Dijkstra(ALGraph G, int v0, int path[], int dist[]){
             q[p->adjvex] = p->weight;
             p = p->nextarc;
         }
-        for (j = 0; v < G.n; ++j){//调整其余在V-S的点
+        for (j = 0; j < G.n; ++j){//调整其余在V-S的点
 
             if (sign[j] == 0 && (dist[v] + q[j]<dist[j]))
             {

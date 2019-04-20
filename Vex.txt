@@ -1,4 +1,4 @@
-7
+8
 0
 SpotA
 Tickets:$100
@@ -19,4 +19,7 @@ SpotF
 Tickets:$5
 6
 SpotG
+Tickets:$15
+7
+SpotH
 Tickets:$15
